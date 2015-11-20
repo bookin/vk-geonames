@@ -33,7 +33,7 @@ class Dumper
         $tables = [
             self::TABLE_COUNTRY,
             self::TABLE_REGION,
-            self::TABLE_REGION
+            self::TABLE_CITY
         ];
         if(in_array($table, $tables)){
             return $this->getPrefix().$table;
