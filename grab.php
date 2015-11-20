@@ -6,6 +6,7 @@ require 'Grabber.php';
 require 'Dumper.php';
 
 use bookin\geonames\Dumper;
+use \bookin\geonames\Grabber;
 
 $lang_param = ['ru'];
 foreach($argv as $arg){
@@ -14,10 +15,10 @@ foreach($argv as $arg){
     }
 }
 
-$dumper = new Dumper();
-$grabber = new \bookin\geonames\Grabber();
+$grabber = new Grabber();
 
 echo "\n\n=======Countries=======\n\n";
+$dumper = new Dumper();
 $country_ids = [];
 $county_values = [];
 foreach($lang_param as $lang){
@@ -48,6 +49,7 @@ unset($county_values);
 #=====================#
 
 echo "\n\n=======Regions=======\n\n";
+$dumper = new Dumper();
 $region_ids = [];
 $dumper->openDump(Dumper::TABLE_REGION, $dumper->getRegionTable($lang_param));
 foreach($country_ids as $country_id){
@@ -120,6 +122,7 @@ function get_cities($country_id, $region_id, $lang, $offset, &$city_values, $gra
         echo "ERROR: ".$c->getMessage();
     }
 }
+$dumper = new Dumper();
 $dumper->openDump(Dumper::TABLE_CITY, $dumper->getCityTable($lang_param));
 foreach($region_ids as $country_id=>$regions){
 

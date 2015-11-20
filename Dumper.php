@@ -17,6 +17,7 @@ class Dumper
     protected $_prefix = '';
     private $_fp;
     private $_last_file_name = '';
+    private $is_wrote = false;
 
     public function __construct($lang=[]){
         if(!empty($lang)){
@@ -130,37 +131,42 @@ class Dumper
     }
 
     public function writeValues($rows){
-        $sql = '';
-        if(is_array($rows)){
-            foreach($rows as $row){
-                $sql .= (strlen($sql)?", ":"");
-                if(is_array($row)){
-                    $sql .= "(";
-                    $end = count($row)-1;
-                    $i=0;
-                    foreach($row as $data){
-                        if(is_string($data)){
-                            $data = self::escape($data);
+        $sql = "";
+        if(!empty($rows)){
+            var_dump(count($rows), $this->is_wrote);
+            $sql .= ($this->is_wrote?", ":"");
+            if(is_array($rows)){
+                foreach($rows as $row){
+                    $sql .= (strlen($sql)>2?", ":"");
+                    if(is_array($row)){
+                        $sql .= "(";
+                        $end = count($row)-1;
+                        $i=0;
+                        foreach($row as $data){
+                            if(is_string($data)){
+                                $data = self::escape($data);
+                            }
+                            if(is_int($data)){
+                                $sql .= $data;
+                            }else{
+                                $sql .= "'$data'";
+                            }
+                            if($i!=$end){
+                                $sql .= ", ";
+                            }
+                            $i++;
                         }
-                        if(is_int($data)){
-                            $sql .= $data;
-                        }else{
-                            $sql .= "'$data'";
-                        }
-                        if($i!=$end){
-                            $sql .= ", ";
-                        }
-                        $i++;
+                        $sql .= ")";
+                    }else{
+                        $sql .= $row;
                     }
-                    $sql .= ")";
-                }else{
-                    $sql .= $row;
                 }
+            }else{
+                $sql = $rows;
             }
-        }else{
-            $sql = $rows;
+            fwrite($this->_fp, $sql);
+            $this->is_wrote = true;
         }
-        fwrite($this->_fp, $sql);
     }
 
     public function closeDump(){
