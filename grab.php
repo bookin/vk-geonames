@@ -1,4 +1,7 @@
 <?php
+$startMemory = 0;
+$startMemory = memory_get_usage();
+
 require 'Grabber.php';
 require 'Dumper.php';
 
@@ -14,6 +17,7 @@ foreach($argv as $arg){
 $dumper = new Dumper();
 $grabber = new \bookin\geonames\Grabber();
 
+echo "=======Countries=======\n\n";
 $country_ids = [];
 $county_values = [];
 foreach($lang_param as $lang){
@@ -43,6 +47,7 @@ unset($county_values);
 
 #=====================#
 
+echo "=======Regions=======\n\n";
 $region_ids = [];
 $dumper->openDump(Dumper::TABLE_REGION, $dumper->getRegionTable($lang_param));
 foreach($country_ids as $country_id){
@@ -79,6 +84,7 @@ unset($region_values);
 
 #=====================#
 
+echo "=======Cities=======\n\n";
 $dumper->openDump(Dumper::TABLE_CITY, $dumper->getCityTable($lang_param));
 foreach($region_ids as $country_id=>$regions){
 
@@ -125,3 +131,5 @@ foreach($region_ids as $country_id=>$regions){
 }
 $dumper->closeDump();
 unset($city_values);
+
+echo "Memory - ".(memory_get_usage() - $startMemory) . ' bytes' . PHP_EOL;
