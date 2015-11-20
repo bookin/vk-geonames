@@ -65,26 +65,46 @@ class Dumper
 
     public function getCountryTable($lang=[]){
         $table_name = $this->getTableName(self::TABLE_COUNTRY);
-        $rows[] = "`country_id` int(11) NOT NULL";
-        return $this->generateTableSql($table_name, $rows, $lang);
+        $rows = [
+            "`country_id` int(11) NOT NULL",
+        ];
+        $keys = [
+            "PRIMARY KEY  (`country_id`)"
+        ];
+        return $this->generateTableSql($table_name, $rows, $keys, $lang);
     }
 
     public function getRegionTable($lang=[]){
         $table_name = $this->getTableName(self::TABLE_COUNTRY);
-        $rows = [];
-        $rows[] = "`region_id` int(11) NOT NULL";
-        $rows[] = "`country_id` int(11) NOT NULL";
-        return $this->generateTableSql($table_name, $rows, $lang);
+        $rows = [
+            "`region_id` int(11) NOT NULL",
+            "`country_id` int(11) NOT NULL",
+
+        ];
+        $keys = [
+            "PRIMARY KEY  (`region_id`)",
+            "KEY `in_region__country_id` (`country_id`)",
+            "FOREIGN KEY fk_country_country_id__region_country_id (`country_id`) REFERENCES `".$this->getTableName(self::TABLE_COUNTRY)."`(`country_id`) ON DELETE CASCADE ON UPDATE CASCADE"
+        ];
+        return $this->generateTableSql($table_name, $rows, $keys, $lang);
     }
 
     public function getCityTable($lang=[]){
         $table_name = $this->getTableName(self::TABLE_COUNTRY);
-        $rows = [];
-        $rows[] = "`city_id` int(11) NOT NULL";
-        $rows[] = "`country_id` int(11) NOT NULL";
-        $rows[] = "`region_id` int(11) NOT NULL";
-        $rows[] = "`important` tinyint(1) NOT NULL DEFAULT '0'";
-        return $this->generateTableSql($table_name, $rows, $lang);
+        $rows = [
+            "`city_id` int(11) NOT NULL",
+            "`country_id` int(11) NOT NULL",
+            "`region_id` int(11) NOT NULL",
+            "`important` tinyint(1) NOT NULL DEFAULT '0'"
+        ];
+        $keys = [
+            "PRIMARY KEY  (`city_id`)",
+            "KEY `in_city__country_id` (`country_id`)",
+            "KEY `in_city__region_id` (`region_id`)",
+            "FOREIGN KEY fk_country_country_id__city_country_id (`country_id`) REFERENCES `".$this->getTableName(self::TABLE_COUNTRY)."`(`country_id`) ON DELETE CASCADE ON UPDATE CASCADE",
+            "FOREIGN KEY fk_region_region_id__city_region_id (`region_id`) REFERENCES `".$this->getTableName(self::TABLE_REGION)."`(`region_id`) ON DELETE CASCADE ON UPDATE CASCADE"
+        ];
+        return $this->generateTableSql($table_name, $rows, $keys, $lang);
     }
 
     public function openDump($table_name, $table_dump){
@@ -154,15 +174,17 @@ class Dumper
         return $this->getLastFileName();
     }
 
-    protected function generateTableSql($table_name, $rows=[], $lang=[]){
-        foreach($lang as $lang){
-            $rows[] = "`name_$lang` varchar(60) DEFAULT NULL";
+    protected function generateTableSql($table_name, $rows=[], $keys=[], $lang=[]){
+        foreach($lang as $lng){
+            $rows[] = "`name_$lng` varchar(60) DEFAULT NULL";
         }
-        $sql = "DROP TABLE IF EXISTS ".$table_name.";
-CREATE TABLE ".$table_name." (
-  ".implode(', ',$rows)."
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ";
+
+        if(!empty($keys)){
+            $rows = array_merge($rows, $keys);
+        }
+        $fields = implode(",\n",$rows);
+        $sql = "DROP TABLE IF EXISTS `$table_name`;\n";
+        $sql .= "CREATE TABLE $table_name (\n".$fields."\n) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
         return $sql;
     }
 
