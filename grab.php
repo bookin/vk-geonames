@@ -106,9 +106,9 @@ foreach($region_ids as $country_id=>$regions){
                             $city_values[$city['id']] = [
                                 'city_id'=>(int)$city['id'],
                                 'country_id'=>(int)$country_id,
-                                'region_id'=>(int)$region['id'],
-                                'important'=>(int)$region['important'],
-                                'name_'.$lang=>$region['title']
+                                'region_id'=>(int)$region_id,
+                                'important'=>(int)$city['important'],
+                                'name_'.$lang=>$city['title']
                             ];
                         }else{
                             $city_values[$city['id']]['name_'.$lang]=$city['title'];
@@ -120,9 +120,8 @@ foreach($region_ids as $country_id=>$regions){
                     echo "ERROR: ".$c->getMessage();
                 }
                 $offset+=1000;
+                sleep(.5);
             }
-
-            sleep(.5);
         }
 
         $dumper->writeValues($city_values);
