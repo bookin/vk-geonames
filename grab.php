@@ -17,7 +17,7 @@ foreach($argv as $arg){
 $dumper = new Dumper();
 $grabber = new \bookin\geonames\Grabber();
 
-echo "=======Countries=======\n\n";
+echo "\n\n=======Countries=======\n\n";
 $country_ids = [];
 $county_values = [];
 foreach($lang_param as $lang){
@@ -47,7 +47,7 @@ unset($county_values);
 
 #=====================#
 
-echo "=======Regions=======\n\n";
+echo "\n\n=======Regions=======\n\n";
 $region_ids = [];
 $dumper->openDump(Dumper::TABLE_REGION, $dumper->getRegionTable($lang_param));
 foreach($country_ids as $country_id){
@@ -84,7 +84,42 @@ unset($region_values);
 
 #=====================#
 
-echo "=======Cities=======\n\n";
+echo "\n\n=======Cities=======\n\n";
+/**
+ * @param $country_id
+ * @param $region_id
+ * @param $lang
+ * @param $offset
+ * @param $city_values
+ * @param \bookin\geonames\Grabber $grabber
+ */
+function get_cities($country_id, $region_id, $lang, $offset, &$city_values, $grabber){
+    try{
+
+        foreach($grabber->getCities($country_id, $region_id, $offset) as $city){
+
+            if(!isset($city_values[$city['id']])){
+                $city_values[$city['id']] = [
+                    'city_id'=>(int)$city['id'],
+                    'country_id'=>(int)$country_id,
+                    'region_id'=>(int)$region_id,
+                    'important'=>(int)$city['important'],
+                    'name_'.$lang=>$city['title']
+                ];
+            }else{
+                $city_values[$city['id']]['name_'.$lang]=$city['title'];
+            }
+
+        }
+
+    }catch (Exception $c){
+        if(in_array((int)$c->getCode(), [1, 10, 6])){
+            sleep(2);
+            get_cities($country_id, $region_id, $lang, $offset, $city_values, $grabber);
+        }
+        echo "ERROR: ".$c->getMessage();
+    }
+}
 $dumper->openDump(Dumper::TABLE_CITY, $dumper->getCityTable($lang_param));
 foreach($region_ids as $country_id=>$regions){
 
@@ -98,27 +133,7 @@ foreach($region_ids as $country_id=>$regions){
             $city_count = $grabber->getCityCount($country_id, $region_id);
             $offset = 0;
             while($offset<$city_count){
-                try{
-
-                    foreach($grabber->getCities($country_id, $region_id) as $city){
-
-                        if(!isset($city_values[$city['id']])){
-                            $city_values[$city['id']] = [
-                                'city_id'=>(int)$city['id'],
-                                'country_id'=>(int)$country_id,
-                                'region_id'=>(int)$region_id,
-                                'important'=>(int)$city['important'],
-                                'name_'.$lang=>$city['title']
-                            ];
-                        }else{
-                            $city_values[$city['id']]['name_'.$lang]=$city['title'];
-                        }
-
-                    }
-
-                }catch (Exception $c){
-                    echo "ERROR: ".$c->getMessage();
-                }
+                get_cities($country_id, $region_id, $lang, $offset, $city_values, $grabber);
                 $offset+=1000;
                 sleep(.5);
             }
