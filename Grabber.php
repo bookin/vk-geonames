@@ -78,7 +78,7 @@ class Grabber
      * @throws \Exception
      */
     public function getCities($country_id, $region_id, $offset=0){
-        $method = 'getCountries';
+        $method = 'getCities';
         $response = $this->request($method, ['country_id'=>$country_id, 'region_id'=>$region_id], $offset);
         if($response['response']['count']>0){
             foreach($response['response']['items'] as $city){
