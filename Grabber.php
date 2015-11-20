@@ -116,7 +116,7 @@ class Grabber
         echo 'Response count - '.$arr['response']['count']."\n";
 
         if(isset($arr['error'])){
-            throw new \Exception("Api error - ".$arr['error']['error_msg']."; Url -".$methodUrl);
+            throw new \Exception("Api error - ".$arr['error']['error_msg']."; Url -".$methodUrl, $arr['error']['error_code']);
         }
 
         if(!isset($arr['response']['count'])){
