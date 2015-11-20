@@ -37,7 +37,7 @@ class Grabber
      * @throws \Exception
      */
     public function getRegionCount($country_id){
-        $method = 'getCountries';
+        $method = 'getRegions';
         $response = $this->request($method, ['country_id'=>$country_id]);
         return $response['response']['count'];
     }
@@ -49,7 +49,7 @@ class Grabber
      * @throws \Exception
      */
     public function getRegions($country_id, $offset=0){
-        $method = 'getCountries';
+        $method = 'getRegions';
         $response = $this->request($method, ['country_id'=>$country_id], $offset);
         if($response['response']['count']>0){
             foreach($response['response']['items'] as $region){
@@ -65,7 +65,7 @@ class Grabber
      * @throws \Exception
      */
     public function getCityCount($country_id, $region_id){
-        $method = 'getCountries';
+        $method = 'getCities';
         $response = $this->request($method, ['country_id'=>$country_id, 'region_id'=>$region_id]);
         return $response['response']['count'];
     }
@@ -116,7 +116,7 @@ class Grabber
         echo 'Response count - '.$arr['response']['count']."\n";
 
         if(isset($arr['error'])){
-            throw new \Exception("Api error - ".$arr['error']['error_msg']);
+            throw new \Exception("Api error - ".$arr['error']['error_msg']."; Url -".$methodUrl);
         }
 
         if(!isset($arr['response']['count'])){
