@@ -75,7 +75,7 @@ class Dumper
     }
 
     public function getRegionTable($lang=[]){
-        $table_name = $this->getTableName(self::TABLE_COUNTRY);
+        $table_name = $this->getTableName(self::TABLE_REGION);
         $rows = [
             "`region_id` int(11) NOT NULL",
             "`country_id` int(11) NOT NULL",
@@ -90,7 +90,7 @@ class Dumper
     }
 
     public function getCityTable($lang=[]){
-        $table_name = $this->getTableName(self::TABLE_COUNTRY);
+        $table_name = $this->getTableName(self::TABLE_CITY);
         $rows = [
             "`city_id` int(11) NOT NULL",
             "`country_id` int(11) NOT NULL",
