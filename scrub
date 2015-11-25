@@ -1,0 +1,5 @@
+<?php
+require_once "ConsoleApp.php";
+
+$app = new bookin\geonames\ConsoleApp();
+$app->run();
